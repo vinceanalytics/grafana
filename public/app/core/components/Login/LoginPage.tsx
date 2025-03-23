@@ -6,6 +6,7 @@ import { GrafanaTheme2 } from '@grafana/data';
 import { config } from '@grafana/runtime';
 import { Alert, LinkButton, Stack, useStyles2 } from '@grafana/ui';
 import { Branding } from 'app/core/components/Branding/Branding';
+import { BrandingSettings } from 'app/core/components/Branding/types';
 import { t, Trans } from 'app/core/internationalization';
 
 import { ChangePassword } from '../ForgottenPassword/ChangePassword';
@@ -20,7 +21,15 @@ import { UserSignup } from './UserSignup';
 
 const LoginPage = () => {
   const styles = useStyles2(getStyles);
-  document.title = Branding.AppTitle;
+  let title = Branding.AppTitle;
+  //@ts-ignore
+  const { whitelabeling } = config.bootData.settings;
+  let branding: BrandingSettings | undefined = undefined;
+  if (whitelabeling) {
+    branding = whitelabeling as BrandingSettings;
+    title = branding?.appTitle ?? Branding.AppTitle;
+  }
+  document.title = title;
 
   return (
     <LoginCtrl>
@@ -40,7 +49,7 @@ const LoginPage = () => {
         showDefaultPasswordWarning,
         loginErrorMessage,
       }) => (
-        <LoginLayout isChangingPassword={isChangingPassword}>
+        <LoginLayout isChangingPassword={isChangingPassword} branding={branding}>
           {!isChangingPassword && !showPasswordlessConfirmation && (
             <InnerBox>
               {loginErrorMessage && (
